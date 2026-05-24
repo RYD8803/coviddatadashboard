@@ -1,0 +1,110 @@
+---
+title: "COVID-19 Reports Dashboard"
+date: "`r Sys.Date()`"
+output:
+  ioslides_presentation: 
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{css, echo=FALSE}
+slides > slide {
+  font-size: 14px;
+}
+
+pre {
+  font-size: 12px;
+}
+```
+
+## Overview
+
+This presentation introduces an interactive Shiny application designed to explore global COVID-19 trends.
+
+Data were taken from WHO Statistical Release, which can be accessed here: <https://data.who.int/dashboards/covid19/data>
+
+### Features
+
+- Cumulative cases and deaths visualization
+- Country and WHO region filtering
+- Time-based analysis
+- Interactive Plotly graphs
+
+## How to Use
+
+- Select time range using date filter
+- Switch between Country and WHO Region view
+- View cumulative cases and deaths
+- Interactive tooltips using Plotly
+- Customize plot appearance (titles, axes)
+
+### RPubs Shiny App
+
+The Shiny App can be accessed here: <https://ryd8803.shinyapps.io/COVID19_Dashboard_DataReport/>
+
+GitHub can be accessed here: <https://github.com/RYD8803/coviddatadashboard>
+
+```{r, warning = FALSE, echo = FALSE, message = FALSE, eval = FALSE, results = 'hide'}
+url <- "https://srhdpeuwpubsa.blob.core.windows.net/whdh/COVID/WHO-COVID-19-global-daily-data.csv"
+
+download.file(url, destfile = "coviddata.csv", method = "curl")
+```
+
+```{r, warning = FALSE, echo = FALSE, message = FALSE, eval = TRUE, results = 'hide'}
+coviddata <- read.csv("coviddata.csv", header = TRUE)
+head(coviddata)
+tail(coviddata)
+```
+
+```{r, warning = FALSE, echo = FALSE, message = FALSE, eval = TRUE, results = 'hide'}
+#cleaning the data
+coviddata$Country <- replace(coviddata$Country, coviddata$Country == "Cura�ao", "Curaçao")
+coviddata$Country <- replace(coviddata$Country, coviddata$Country == "R�union", "Réunion")
+coviddata$Date_reported <- as.Date(coviddata$Date_reported)
+head(coviddata)
+```
+
+## Example Usage
+
+We want to plot the number of cumulative cases for Indonesia, Malaysia, and Singapore in 2020 - 2022
+
+Start date = 2020-01-04
+
+End date = 2022-12-31
+
+```{r, warning = FALSE, eval = FALSE, echo = TRUE, message = FALSE}
+library(plotly)
+country_select <- c("Indonesia", "Malaysia", "Singapore")
+date_range <- c("2020-01-04", "2022-12-31")
+
+#Filter the date and country
+datacountry <- coviddata[coviddata$Country %in% country_select, ]
+data <- datacountry[datacountry$Date_reported >= date_range[1] & datacountry$Date_reported <= date_range[2], ]
+
+#Plot with plot_ly            
+p <- plot_ly(data, x = ~Date_reported, y = ~Cumulative_cases, mode = "lines+markers", type = "scatter", color = ~Country, 
+        text = ~paste("Country:", Country, "(", Country_code, ")", "<br>WHO Region:", WHO_region, 
+        "<br>New cases:", New_cases, "<br>Cumulative cases:", Cumulative_cases), hoverinfo = "text")
+
+p
+```
+
+## Plot
+
+```{r, warning = FALSE, eval = TRUE, echo = FALSE, message = FALSE}
+library(plotly)
+country_select <- c("Indonesia", "Malaysia", "Singapore")
+date_range <- c("2020-01-04", "2022-12-31")
+
+datacountry <- coviddata[coviddata$Country %in% country_select, ]
+data <- datacountry[datacountry$Date_reported >= date_range[1] & datacountry$Date_reported <= date_range[2], ]
+            
+p <- plot_ly(data, x = ~Date_reported, y = ~Cumulative_cases, mode = "lines+markers", type = "scatter", color = ~Country, 
+        text = ~paste("Country:", Country, "(", Country_code, ")", "<br>WHO Region:", WHO_region, 
+        "<br>New cases:", New_cases, "<br>Cumulative cases:", Cumulative_cases), hoverinfo = "text")
+
+p
+```
