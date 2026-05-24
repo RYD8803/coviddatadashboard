@@ -26,6 +26,6 @@ The Shiny App can be accessed here: <https://ryd8803.shinyapps.io/COVID19_Dashbo
 
 ### Note
 
-Data is based on WHO COVID-19 global daily reports.
+Data is based on World Health Organization (WHO) COVID-19 global daily reports.
 Source: <https://data.who.int/dashboards/covid19/data>
 Last Modified: 2026-05-24
